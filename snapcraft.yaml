@@ -5,6 +5,13 @@ summary: A simple Rust hello world application
 description: |
   A demonstration Rust application that prints a greeting.
 
+title: Hello Rust
+license: Apache-2.0
+contact: me@zygoon.pl
+website: https://github.com/zyga/hello-rust
+source-code: https://github.com/zyga/hello-rust
+issues: https://github.com/zyga/hello-rust/issues
+
 grade: stable
 confinement: strict
 
