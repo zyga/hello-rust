@@ -1,0 +1,24 @@
+name: hello-rust-zygoon
+base: core24
+version: "0.1.0"
+summary: A simple Rust hello world application
+description: |
+  A demonstration Rust application that prints a greeting.
+
+grade: stable
+confinement: strict
+
+apps:
+  hello-rust-zygoon:
+    command: bin/hello-rust-zygoon
+    plugs:
+      - home
+
+parts:
+  hello-rust-zygoon:
+    plugin: rust
+    source: .
+    rust-channel: stable
+    build-packages:
+      - build-essential
+      - pkg-config
