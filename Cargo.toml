@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: Canonical Ltd.
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "hello-rust-zygoon"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

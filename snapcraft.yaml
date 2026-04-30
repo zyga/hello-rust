@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: Canonical Ltd.
+# SPDX-License-Identifier: Apache-2.0
+name: hello-rust-zygoon
+base: core24
+version: "0.1.0"
+summary: A simple Rust hello world application
+description: |
+  A demonstration Rust application that prints a greeting.
+
+title: Hello Rust
+license: Apache-2.0
+contact: me@zygoon.pl
+website: https://github.com/zyga/hello-rust
+source-code: https://github.com/zyga/hello-rust
+issues: https://github.com/zyga/hello-rust/issues
+donation: https://github.com/sponsors/zyga
+
+grade: stable
+confinement: strict
+
+apps:
+  hello-rust-zygoon:
+    command: bin/hello-rust-zygoon
+    plugs:
+      - home
+
+parts:
+  hello-rust-zygoon:
+    plugin: rust
+    source: .
+    rust-channel: stable
+    build-packages:
+      - build-essential
+      - pkg-config
