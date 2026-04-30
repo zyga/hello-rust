@@ -230,31 +230,13 @@ jobs:
   # SNAPCRAFT_STORE_CREDENTIALS. Export the secret value locally with:
   # snapcraft export-login --snaps=<snap-name> --channels=<publish-channel> \
   #   --acls=package_upload,package_release <token-name>
-  snapcraft-upload-amd64:
-    name: snapcraft upload (amd64)
-    needs: [snapcraft-pack-amd64, spread-amd64]
+  snapcraft-upload:
+    name: snapcraft upload
+    # Upload built snaps only after smoke testing the amd64 build first.
+    needs: [snapcraft-pack-amd64, snapcraft-pack-arm64, spread-amd64]
     uses: ./.github/workflows/snapcraft-upload.yml
     with:
-      job-arch: amd64
-      artifact-name: snap-${{ needs.snapcraft-pack-amd64.outputs.arch }}
-      cache-host-snaps: ${{ inputs.cache-host-snaps }}
-      snapd-channel: ${{ inputs.snapd-channel }}
-      core24-channel: ${{ inputs.core24-channel }}
-      snapcraft-channel: ${{ inputs.snapcraft-channel }}
-      snapstore-channel: ${{ inputs.snapstore-channel }}
-      github-environment: ${{ inputs.github-environment || (github.ref_type == 'tag' && 'latest/candidate' || 'latest/edge') }}
-      github-deployment: ${{ inputs.github-deployment }}
-    secrets:
-      publish-credentials: ${{ secrets.publish-credentials }}
-
-  snapcraft-upload-arm64:
-    name: snapcraft upload (arm64)
-    # Upload amd64 builds only after smoke testing the amd64 builds first.
-    needs: [snapcraft-pack-arm64, spread-amd64]
-    uses: ./.github/workflows/snapcraft-upload.yml
-    with:
-      job-arch: arm64
-      artifact-name: snap-${{ needs.snapcraft-pack-arm64.outputs.arch }}
+      artifact-pattern: snap-*
       cache-host-snaps: ${{ inputs.cache-host-snaps }}
       snapd-channel: ${{ inputs.snapd-channel }}
       core24-channel: ${{ inputs.core24-channel }}

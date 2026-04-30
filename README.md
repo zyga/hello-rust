@@ -51,7 +51,7 @@ Before copying this pipeline to another project, make sure you have:
 2. Discovers spread systems at runtime from `spread.yaml` by running
    `spread -list`.
 3. Runs spread smoke tests on `amd64`.
-4. Uploads the resulting snaps to the Snap Store.
+4. Uploads the resulting snaps to the Snap Store in a single deployment job.
 
 By default:
 

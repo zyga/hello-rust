@@ -5,14 +5,16 @@ name: snapcraft upload
 on:
   workflow_call:
     inputs:
-      job-arch:
-        type: string
-        description: Architecture label used in the GitHub job name
-        required: true
       artifact-name:
         type: string
         description: "Artifact name to download and publish"
-        required: true
+        required: false
+        default: ""
+      artifact-pattern:
+        type: string
+        description: "Artifact name pattern to download and publish"
+        required: false
+        default: ""
       cache-host-snaps:
         type: boolean
         description: "Whether to cache host snaps (snapd, core24) during installation"
@@ -54,7 +56,7 @@ on:
 
 jobs:
   upload:
-    name: upload (${{ inputs.job-arch }})
+    name: upload
     runs-on: ubuntu-24.04
     environment:
       name: ${{ inputs.github-environment }}
@@ -86,19 +88,28 @@ jobs:
           enable-cache: ${{ inputs.cache-host-snaps }}
 
       - name: Download snap artifact
+        if: ${{ inputs.artifact-pattern == '' }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
           path: ./snaps/
+
+      - name: Download snap artifacts
+        if: ${{ inputs.artifact-pattern != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ inputs.artifact-pattern }}
+          path: ./snaps/
+          merge-multiple: true
 
       - name: Release to ${{ inputs.snapstore-channel }}
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.publish-credentials }}
           SNAP_CHANNEL: ${{ inputs.snapstore-channel }}
         run: |
-          shopt -s nullglob
+          shopt -s nullglob globstar
 
-          for SNAP_FILE in ./snaps/*.snap; do
+          for SNAP_FILE in ./snaps/**/*.snap; do
             [ -f "$SNAP_FILE" ] || continue
             
             echo "Publishing $SNAP_FILE to $SNAP_CHANNEL"
