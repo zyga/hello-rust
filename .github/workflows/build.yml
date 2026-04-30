@@ -44,3 +44,53 @@ jobs:
         with:
           name: hello-rust-zygoon
           path: target/release/hello-rust-zygoon
+
+  snapcraft-pack-amd64:
+    name: snapcraft (amd64)
+    needs: build
+    uses: ./.github/workflows/snapcraft-pack.yml
+
+  snapcraft-pack-arm64:
+    name: snapcraft (arm64)
+    needs: build
+    uses: ./.github/workflows/snapcraft-pack.yml
+    with:
+      runs-on: ubuntu-24.04-arm
+
+  spread-amd64:
+    name: spread (amd64)
+    needs: snapcraft-pack-amd64
+    uses: ./.github/workflows/spread.yml
+    with:
+      spread-system: ubuntu-cloud-24.04
+      spread-arch: x86_64
+      snap-artifact-name: snap-${{ needs.snapcraft-pack-amd64.outputs.arch }}
+      snap-filename: ${{ needs.snapcraft-pack-amd64.outputs.snap-filename }}
+
+  # Credentials can be exported with:
+  # snapcraft export-login --snaps=hello-rust-zygoon --channels=latest/edge --acls=package_release,package_upload EDGE
+
+  snapcraft-upload-amd64:
+    name: snapcraft (amd64)
+    needs: [snapcraft-pack-amd64, spread-amd64]
+    uses: ./.github/workflows/snapcraft-upload.yml
+    with:
+      artifact-name: snap-x86_64
+      snapstore-channel: ${{ vars.SNAPCRAFT_CHANNEL }}
+      github-environment: snapcraft
+      github-deployment: true
+    secrets:
+      publish-credentials: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+  snapcraft-upload-arm64:
+    name: snapcraft (arm64)
+    # Wait for amd64 spread tests before publishing.
+    needs: [snapcraft-pack-arm64, spread-amd64]
+    uses: ./.github/workflows/snapcraft-upload.yml
+    with:
+      artifact-name: snap-aarch64
+      snapstore-channel: ${{ vars.SNAPCRAFT_CHANNEL }}
+      github-environment: snapcraft
+      github-deployment: true
+    secrets:
+      publish-credentials: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

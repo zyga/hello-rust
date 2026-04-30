@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+name: Install Cached Snap
+description: Download and install a snap with caching support
+inputs:
+  snap-name:
+    description: Name of the snap to install
+    required: true
+  channel:
+    description: Snap store channel (e.g., latest/stable, latest/edge)
+    default: latest/stable
+  classic:
+    description: Whether to install with --classic flag
+    default: "false"
+  cache-dir:
+    description: Cache directory for downloaded snaps
+    default: ${{ github.workspace }}/.cache/snaps
+  enable-cache:
+    description: Enable snap caching (default true)
+    default: "true"
+runs:
+  using: composite
+  steps:
+    - name: Normalize architecture
+      id: arch
+      shell: bash
+      run: |
+        case "${{ runner.arch }}" in
+          X64)
+            echo "normalized=amd64" >> $GITHUB_OUTPUT
+            ;;
+          ARM64)
+            echo "normalized=arm64" >> $GITHUB_OUTPUT
+            ;;
+          *)
+            echo "normalized=${{ runner.arch }}" >> $GITHUB_OUTPUT
+            ;;
+        esac
+
+    - name: Cache ${{ inputs.snap-name }} snap
+      if: ${{ inputs.enable-cache == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ inputs.cache-dir }}/${{ inputs.snap-name }}_*.snap
+          ${{ inputs.cache-dir }}/${{ inputs.snap-name }}_*.assert
+        key: snap-${{ inputs.snap-name }}-for-${{ steps.arch.outputs.normalized }}-from-${{ inputs.channel }}
+
+    - name: Install ${{ inputs.snap-name }} snap
+      shell: bash
+      env:
+        SNAP_NAME: ${{ inputs.snap-name }}
+        CHANNEL: ${{ inputs.channel }}
+        CLASSIC: ${{ inputs.classic }}
+        CACHE_DIR: ${{ inputs.cache-dir }}
+      run: |
+        ${{ github.action_path }}/action.sh
