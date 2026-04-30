@@ -3,6 +3,7 @@ name: Build
 on:
   push:
     branches: [ main, master, develop ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main, master, develop ]
 
@@ -80,7 +81,7 @@ jobs:
     with:
       artifact-name: snap-x86_64
       snapstore-channel: ${{ vars.SNAPCRAFT_CHANNEL }}
-      github-environment: snapcraft
+      github-environment: ${{ github.ref_type == 'tag' && 'latest/candidate' || 'latest/edge' }}
       github-deployment: true
     secrets:
       publish-credentials: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
@@ -93,7 +94,7 @@ jobs:
     with:
       artifact-name: snap-aarch64
       snapstore-channel: ${{ vars.SNAPCRAFT_CHANNEL }}
-      github-environment: snapcraft
+      github-environment: ${{ github.ref_type == 'tag' && 'latest/candidate' || 'latest/edge' }}
       github-deployment: true
     secrets:
       publish-credentials: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
