@@ -26,6 +26,7 @@ backends:
 
 exclude:
     - ".image-garden/*"
+    - ".cache/snaps/*"
 
 path: /root/hello-rust-zygoon
 
