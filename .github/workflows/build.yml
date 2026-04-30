@@ -58,11 +58,14 @@ jobs:
       runs-on: ubuntu-24.04-arm
 
   spread-amd64:
-    name: spread (amd64)
+    name: spread (amd64) - ${{ matrix.spread-system }}
     needs: snapcraft-pack-amd64
+    strategy:
+      matrix:
+        spread-system: [ubuntu-cloud-24.04, ubuntu-cloud-26.04]
     uses: ./.github/workflows/spread.yml
     with:
-      spread-system: ubuntu-cloud-24.04
+      spread-system: ${{ matrix.spread-system }}
       spread-arch: x86_64
       snap-artifact-name: snap-${{ needs.snapcraft-pack-amd64.outputs.arch }}
       snap-filename: ${{ needs.snapcraft-pack-amd64.outputs.snap-filename }}

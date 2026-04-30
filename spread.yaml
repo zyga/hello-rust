@@ -20,6 +20,9 @@ backends:
             - ubuntu-cloud-24.04:
                   username: ubuntu
                   password: ubuntu
+            - ubuntu-cloud-26.04:
+                  username: ubuntu
+                  password: ubuntu
 
 exclude:
     - ".image-garden/*"
