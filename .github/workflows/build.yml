@@ -71,6 +71,19 @@ jobs:
       snap-artifact-name: snap-${{ needs.snapcraft-pack-amd64.outputs.arch }}
       snap-filename: ${{ needs.snapcraft-pack-amd64.outputs.snap-filename }}
 
+  spread-arm64:
+    name: spread (arm64 - emulated) - ${{ matrix.spread-system }}
+    needs: snapcraft-pack-arm64
+    strategy:
+      matrix:
+        spread-system: [ubuntu-cloud-24.04, ubuntu-cloud-26.04]
+    uses: ./.github/workflows/spread.yml
+    with:
+      spread-system: ${{ matrix.spread-system }}
+      spread-arch: aarch64
+      snap-artifact-name: snap-${{ needs.snapcraft-pack-arm64.outputs.arch }}
+      snap-filename: ${{ needs.snapcraft-pack-arm64.outputs.snap-filename }}
+
   # Credentials can be exported with:
   # snapcraft export-login --snaps=hello-rust-zygoon --channels=latest/edge --acls=package_release,package_upload EDGE
 
@@ -88,8 +101,7 @@ jobs:
 
   snapcraft-upload-arm64:
     name: snapcraft (arm64)
-    # Wait for amd64 spread tests before publishing.
-    needs: [snapcraft-pack-arm64, spread-amd64]
+    needs: [snapcraft-pack-arm64, spread-arm64]
     uses: ./.github/workflows/snapcraft-upload.yml
     with:
       artifact-name: snap-aarch64
