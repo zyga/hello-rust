@@ -118,3 +118,43 @@ snapcraft export-login \
 
 Store that value as `SNAPCRAFT_STORE_CREDENTIALS` in the environment whose name
 matches the promotion target, such as `latest/stable`.
+
+## Emergency publishing: Skip integration tests
+
+When integration tests (spread) are flaky but the snap is otherwise ready for
+release, you can skip the spread test phase and publish directly to the Snap
+Store. This requires manual approval and should be used sparingly.
+
+### Using the override
+
+1. Go to your repository's **Actions** tab
+2. Select the **Build** workflow
+3. Click **"Run workflow ▼"** button
+4. Check the box: **"Skip integration tests"**
+5. Click **"Run workflow"**
+6. The build will:
+   - Run unit tests (still required)
+   - Build snaps for amd64 and arm64
+   - Skip spread integration tests
+   - Wait for manual approval before publishing
+7. After approval is granted, snaps publish to the normal channel
+
+### Approval gate setup (optional but recommended)
+
+To add a safety layer, create a GitHub environment for override approvals:
+
+1. Go to **Settings → Environments**
+2. Create a new environment named `snapcraft-release-override`
+3. Under "Deployment branches and secrets":
+   - Add the environment secret `SNAPCRAFT_STORE_CREDENTIALS` (same credentials
+     as `latest/edge` or `latest/candidate`)
+   - Optionally add protection rules to require approval from specific users
+
+Then, in the CI/CD system, routes override runs to this environment for approval
+before publishing.
+
+### When to use this
+
+- **Legitimate use**: Flaky integration tests that block valid releases
+- **Audit trail**: All override runs are logged with who triggered them and when
+- **Not recommended for**: Bypassing legitimate test failures or skipping code review
