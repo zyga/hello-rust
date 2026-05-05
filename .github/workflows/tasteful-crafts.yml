@@ -109,6 +109,11 @@ on:
         description: "Whether upload jobs should be marked as deployments"
         required: false
         default: true
+      skip-spread-tests:
+        type: boolean
+        description: "Skip integration tests (spread) and proceed directly to publishing. Requires manual approval."
+        required: false
+        default: false
     secrets:
       publish-credentials:
         description: "GitHub secret containing Snap Store credentials for publishing"
@@ -117,6 +122,7 @@ on:
 jobs:
   discover-spread-systems:
     name: discover spread systems
+    if: ${{ !inputs.skip-spread-tests }}
     runs-on: ${{ inputs.spread-runs-on }}
     outputs:
       spread-systems: ${{ steps.discover.outputs.spread-systems }}
@@ -201,6 +207,7 @@ jobs:
 
   spread-amd64:
     name: spread (amd64) - ${{ matrix.spread-system }}
+    if: ${{ !inputs.skip-spread-tests }}
     needs: [discover-spread-systems, snapcraft-pack-amd64]
     strategy:
       matrix:
@@ -233,6 +240,8 @@ jobs:
   snapcraft-upload:
     name: snapcraft upload
     # Upload built snaps only after smoke testing the amd64 build first.
+    # When spread tests are skipped, proceed directly after packing is complete.
+    if: ${{ always() }}
     needs: [snapcraft-pack-amd64, snapcraft-pack-arm64, spread-amd64]
     uses: ./.github/workflows/snapcraft-upload.yml
     with:
