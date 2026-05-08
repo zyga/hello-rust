@@ -47,7 +47,7 @@ runs:
         cache_key="snap-${{ inputs.snap-name }}-for-${{ steps.arch.outputs.normalized }}-from-${{ inputs.channel }}"
         if [ -n "${{ inputs.components }}" ]; then
           safe_components="$(printf '%s' "${{ inputs.components }}" | sed 's/[^[:alnum:]._-]/_/g')"
-          scope="${{ inputs.snap-name }}-$safe_components}-${{ steps.arch.outputs.normalized }}-${{ inputs.channel }}"
+          scope="${{ inputs.snap-name }}-$safe_components-${{ steps.arch.outputs.normalized }}-${{ inputs.channel }}"
           cache_key="${cache_key}-with-${safe_components}"
         else
           scope="${{ inputs.snap-name }}-${{ steps.arch.outputs.normalized }}-${{ inputs.channel }}"
