@@ -250,7 +250,7 @@ jobs:
       snapd-channel: ${{ inputs.snapd-channel }}
       core24-channel: ${{ inputs.core24-channel }}
       snapcraft-channel: ${{ inputs.snapcraft-channel }}
-      snapstore-channel: ${{ inputs.snapstore-channel }}
+      snapstore-channel: ${{ inputs.github-environment || (github.ref_type == 'tag' && 'latest/candidate' || 'latest/edge') }}
       github-environment: ${{ inputs.github-environment || (github.ref_type == 'tag' && 'latest/candidate' || 'latest/edge') }}
       github-deployment: ${{ inputs.github-deployment }}
     secrets:
