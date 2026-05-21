@@ -145,7 +145,7 @@ jobs:
             COMP_FILES=""
           fi
           echo "comp-filenames=${COMP_FILES}" >> $GITHUB_OUTPUT
-          if [ -n "$COMP_FILES" ]; then
+          if [ -n "${COMP_FILES}" ]; then
             echo "Component files: ${COMP_FILES}"
           else
             echo "No component files generated"
