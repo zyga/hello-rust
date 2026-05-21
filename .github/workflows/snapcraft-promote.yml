@@ -54,7 +54,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SNAP_NAME="$(sed -nE 's/^name:[[:space:]]*([^[:space:]#]+).*$/\1/p' snapcraft.yaml | head -n1)"
+          SNAP_NAME="$(sed -nE 's/^name:[[:space:]]*([^[:space:]#]+).*$/\1/p' $(find . -name snapcraft.yaml) | head -n1)"
           if [ -z "$SNAP_NAME" ]; then
             echo "::error::Could not determine snap name from snapcraft.yaml"
             exit 1
